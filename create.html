@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/addons/p5.sound.min.js"></script>
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Untitled CAM Project</title>
+</head>
+
+<body>
+    <div class="main">
+        <div id="character-canvas">
+
+        </div>
+
+        <div class="question-container">
+            <h2 id="prompt">This is a question.</h2>
+            
+            <div id="responses">
+                <!-- color -->
+                <input id="color-pick" class='hidden' type="color" value="#ffffff"/>
+
+                <!-- shapes -->
+                <div id='shapes' class="hidden">
+                    <div class="shape square" onclick="shapeResponse('square')"><div></div></div>
+                    <div class="shape circle" onclick="shapeResponse('circle')"><div></div></div>
+                    <div class="shape triangle" onclick="shapeResponse('triangle')"><div></div></div>
+                    <div class="shape star" onclick="shapeResponse('star')"><div></div></div>
+                    <div class="shape rect" onclick="shapeResponse('rect')"><div></div></div>
+                    <div class="shape oval" onclick="shapeResponse('oval')"><div></div></div>
+                </div>
+
+                <!-- free response -->
+                <div id="reflection" class="hidden">
+                    <textarea></textarea>
+                </div>
+
+                <!-- state -->
+                 <div id="state-response" class="hidden">
+                    <input list="states" name="state" id="state" 
+                        onchange="stateResponse()" onkeyup="stateResponse()" 
+                        autocapitalize="on">
+                    <div id="state-error" class="hidden">Please enter a valid state...</div>
+                
+                    <!-- svg container -->
+                    <div id="state-preview" class="hidden"></div>
+                    <!-- filled in by create.js -->
+                    <datalist id="states"></datalist>
+                 </div>
+            </div>
+
+            <div class="next" onclick="submitResponse()">Next -></div>
+        </div>
+    </div>
+    <script src="create.js"></script>
+    <script src="questions.js"></script>
+</body>
+</html>
