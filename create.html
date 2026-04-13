@@ -16,12 +16,45 @@
 </head>
 
 <body>
-    <div class="main">
+    <div id="main">
         <div id="character-canvas">
-
+            <div id="actions">
+                <div id="move-mode" class="active-mode" onclick="changeMode('move-mode')">
+                    <div class="icon">↔</div>
+                    <div class="desc">Move</div>
+                </div>
+                <div id="scale-mode" onclick="changeMode('scale-mode')">
+                    <div class="icon">⛶</div>
+                    <div class="desc">Scale</div>
+                </div>
+                <div id="rotate-mode" onclick="changeMode('rotate-mode')">
+                    <div class="icon">⟳</div>
+                    <div class="desc">Rotate</div>
+                </div>
+            </div>
         </div>
 
-        <div class="question-container">
+        <div id="creation-container" class="hidden">
+            <div id="mode-switch">
+                <div class="inactive-mode" onclick="questionMode()">?</div>
+                <div>✐</div>
+            </div>
+
+            <div id="color-swatches"></div>
+            <!-- <div id="shape-inventory">
+                <div class="circle" onclick="shapeResponse('circle')"><div></div></div>
+                <div class="triangle" onclick="shapeResponse('triangle')"><div></div></div>
+                <div class="rect" onclick="shapeResponse('rect')"><div></div></div>
+                <div class="oval" onclick="shapeResponse('oval')"><div></div></div>
+            </div> -->
+        </div>
+
+        <div id="question-container">
+            <div id="mode-switch">
+                <div>?</div>
+                <div class="inactive-mode" onclick="creationMode()">✐</div>
+            </div>
+
             <h2 id="prompt">This is a question.</h2>
             
             <div id="responses">
@@ -44,7 +77,7 @@
                 </div>
 
                 <!-- state -->
-                 <div id="state-response" class="hidden">
+                <div id="state-response" class="hidden">
                     <input list="states" name="state" id="state" 
                         onchange="stateResponse()" onkeyup="stateResponse()" 
                         autocapitalize="on">
@@ -55,11 +88,50 @@
                     <!-- filled in by create.js -->
                     <datalist id="states"></datalist>
                  </div>
+
+                 <!-- objects -->
+                <div id="objects" class="hidden">
+                    <div class="object 1" onclick="objectResponse('1')"><img src="assets/objects/1.png"/></div>
+                    <div class="object 2" onclick="objectResponse('2')"><img src="assets/objects/2.png"/></div>
+                    <div class="object 3" onclick="objectResponse('3')"><img src="assets/objects/3.png"/></div>
+                    <div class="object 4" onclick="objectResponse('4')"><img src="assets/objects/4.png"/></div>
+                    <div class="object 5" onclick="objectResponse('5')"><img src="assets/objects/5.png"/></div>
+                    <div class="object 6" onclick="objectResponse('6')"><img src="assets/objects/6.png"/></div>
+                 </div>
+
+                <!-- prev visits -->
+                <div id="previous-visits" class="hidden">
+                    <input name="visits" id="visits" type="number" max="500" min="0"
+                        onchange="visitResponse()" onkeyup="visitResponse()">
+                    <div id="visits-error" class="hidden">Please input a valid number</div>
+
+                    <div id="visits-preview">
+                        <!-- TBD... -->
+                    </div>
+                </div>
+
+                <!-- completion -->
+                <div id="finish-character" class="completion-button hidden" onclick="submitResponse()">Complete</div>
+
+                <!-- completion confirmation -->
+                <div id="complete-confirm" class="hidden">
+                    <div class="completion-button" onclick="submitCharacter()">Yes!</div>
+                    <div class="completion-button" onclick="backToEditing()">No, take me back</div>
+                </div>
+
+                <!-- comment -->
             </div>
 
             <div class="next" onclick="submitResponse()">Next -></div>
         </div>
     </div>
+
+    <div id="map-place" class="hidden">
+        <div class="character hidden"><img id="character-img" src='' alt="created character"/></div>
+
+        <div class="bg"><img src='assets/floor1.png' alt="CAM First Floor Layout"/></div>
+    </div>
+
     <script src="create.js"></script>
     <script src="questions.js"></script>
 </body>

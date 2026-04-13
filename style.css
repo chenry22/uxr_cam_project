@@ -1,7 +1,44 @@
 :root {
   --main-color: #000000;
   --prompt-bg-color: #FFFEF6;
-  --canvas-bg-color: #cdfffa;
+  --canvas-bg-color: #ffffff00;
+}
+
+@keyframes gradient-shift {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(-100deg); }
+}
+
+.intro {
+  background: radial-gradient(circle, rgba(40, 182, 184, 0.5) 0%, rgba(252, 255, 89, 0.5) 70%, rgba(255, 186, 195, 0.5) 90%);
+  height: 100dvh;
+  overflow: hidden;
+
+  font-family: 'Space Grotesk';
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  animation: gradient-shift 6s infinite alternate ease-in-out;
+}
+.intro h2 {
+  font-weight: normal;
+  margin: 0;
+}
+.intro h1 {
+  font-weight: 500;
+  font-size: 4rem;
+}
+.intro .button {
+  border: 1px solid black;
+  padding: 10px 14px;
+}
+.intro  a {
+  all: unset;
+}
+.intro a:hover {
+  background-color: rgb(255, 255, 196);
 }
 
 body {
@@ -14,8 +51,97 @@ canvas {
   display: block;
 }
 
-.main {
+#main {
   display: flex;
+}
+
+#mode-switch {
+  z-index: 1;
+  position: absolute;
+  left: -62px;
+  top: 0;
+  width: fit-content;
+}
+#mode-switch div {
+  width: 60px;
+  height: 50px;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 2rem;
+  margin-top: 20px;
+  border: 3px solid rgba(0, 0, 0, 0.03);
+  border-right: none;
+  background-color: var(--prompt-bg-color);
+}
+.inactive-mode {
+  background-color: rgb(241, 240, 225) !important;
+}
+.inactive-mode:hover {
+  cursor: pointer;
+  background-color: rgb(249, 249, 233) !important;
+}
+
+#creation-container {
+  position: relative;
+  flex-basis: 90%;
+  max-width: 45%;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  text-align: center;
+  gap: 20px;
+  border-left: 3px solid rgba(0, 0, 0, 0.03);
+  background-color: var(--prompt-bg-color);
+}
+
+#actions {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#actions > div {
+  text-align: center;
+  background-color: rgb(220, 254, 255);
+  border: 3px solid rgba(0, 0, 0, 0.03);
+  padding: 4px 10px;
+}
+#actions .icon {
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+#actions .desc {
+  font-size: 0.6rem;
+}
+#actions > div:hover {
+  cursor: pointer;
+  background-color: rgb(223, 241, 255);
+}
+.active-mode {
+  background-color: rgb(225, 236, 245) !important;
+}
+
+#color-swatches {
+  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: rgb(232, 213, 213);
+  border: 3px solid rgba(0, 0, 0, 0.03);
+}
+.color {
+  border-radius: 100%;
+  border: 3px solid rgba(0, 0, 0, 0.03);
+  flex-basis: 16%;
+  max-width: 80px;
+  aspect-ratio: 1;
+}
+.color:hover {
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
 }
 
 .hidden {
@@ -27,9 +153,10 @@ canvas {
   background-color: var(--canvas-bg-color);
 }
 
-.question-container {
+#question-container {
   position: relative;
   flex-basis: 90%;
+  max-width: 45%;
   padding: 0 36px;
   display: flex;
   flex-direction: column;
@@ -40,6 +167,7 @@ canvas {
 }
 #prompt {
   font-size: 2rem;
+  font-weight: 500;
 }
 #responses {
   display: flex;
@@ -197,4 +325,99 @@ canvas {
   margin-top: 10px;
   font-style: italic;
   color: rgb(86, 86, 86);
+}
+
+#objects {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+.object {
+  flex-basis: 30%;
+  object-fit: contain;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.object img {
+  max-width: 100%;
+  object-fit: contain;
+}
+.object img:hover {
+  cursor: pointer;
+  filter: drop-shadow(0 0 0.5rem rgba(255, 212, 23, 0.4));
+}
+.selected-obj {
+  filter: drop-shadow(0 0 0.6rem rgba(62, 91, 255, 0.4));
+}
+
+#visits {
+  width: 80%;
+  border: none;
+  border-bottom: 2px solid rgb(72, 72, 72);
+  font-family: 'Space Grotesk';
+  padding: 8px;
+  font-size: 1.5rem;
+}
+#visits-error {
+  margin-top: 10px;
+  font-style: italic;
+  color: rgb(86, 86, 86);
+}
+
+.completion-button {
+  font-size: 1.4rem;
+  padding: 14px 24px;
+  margin: 0 auto;
+  border: 1px solid rgb(150, 150, 150);
+  background-color: rgba(241, 255, 255, 0.5);
+}
+.completion-button:hover {
+  cursor: pointer;
+  background-color: rgba(246, 255, 255, 0.95);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+#complete-confirm {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: center;
+}
+
+#map-place {
+  width: 100%;
+  height: 100%;
+}
+
+.bg {
+  width: 100%;
+  height: 95%;
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+}
+.bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.character {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+#character-img {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24dvw;
+  height: 28dvh;
+  object-fit: contain;
 }
