@@ -3,13 +3,12 @@ const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado',
 const questions = [
     "What color do you feel like at the moment?",
     "Please choose a shape you most identify with right now.",
-    "Share some reflections from your museum visit today:",
+    "Share some reflections from your museum visit today (these will not be shared with other visitors):",
     "What state are you from?",
     "Choose an object you're drawn to:",
     "How many times have you visited CAM before?",
     "Finish creating your self portrait!",
-    "Are you sure you're finished?",
-    "Leave a comment for other visitors! (optional)"
+    "Are you sure you're finished?"
 ];
 
 const defaultColors = ['#000000', "#ffffff", "#E6E6E6", '#FF2B01', '#00aeef'];
@@ -33,6 +32,12 @@ window.addEventListener('load', () => {
     loadStateOptions();
     loadQuestion(question);
     loadColors();
+
+    document.getElementById('state').addEventListener("keydown", function (e) {
+        if (e.key === 'Enter') {
+            autocompleteState();
+        }
+    });
 });
 
 function questionMode() {
@@ -201,10 +206,10 @@ function submitResponse() {
 
 function shapeResponse(shape) {
     personalShape = shape;
-    for(var s of document.getElementsByClassName('shape')) {
+    for(var s of document.getElementById('shapes').getElementsByClassName('shape')) {
         s.classList.remove('selected');
     }
-    document.getElementsByClassName(shape)[0].classList.add('selected');
+    document.getElementById('shapes').getElementsByClassName(shape)[0].classList.add('selected');
 }
 
 function loadStateOptions() {
@@ -213,6 +218,16 @@ function loadStateOptions() {
         let opt = document.createElement('option');
         opt.value = state;
         stateList.appendChild(opt);
+    }
+}
+function autocompleteState(e) {
+    let s = document.getElementById('state').value + '';
+    for (var state of states) {
+        if (state.toLowerCase().startsWith(s.toLowerCase())) {
+            console.log(state);
+            document.getElementById('state').value = state;
+            return;
+        }
     }
 }
 function stateResponse() {
@@ -275,23 +290,9 @@ function backToEditing() {
 }
 
 function submitCharacter() {
-    // basically flatten canvas element... maybe just turn into PNG?
-    // then upload to DB (with comment and maybe behavior pattern)
-
     const character = document.getElementById("character-canvas").getElementsByTagName('canvas')[0];
     characterImgURL = character.toDataURL(); // convert to PNG?
-
-    document.addEventListener('mousemove', (e) => {
-        console.log('move', e.clientX, e.clientY);
-        let character = document.getElementById('character-img');
-        character.style.left = e.clientX - 80 + 'px';
-        character.style.top = e.clientY - 90 + 'px';
-    });
-
-    document.getElementById('character-img').setAttribute('src', characterImgURL);
-    document.getElementById('main').classList.add('hidden');
-    document.getElementById('map-place').classList.remove('hidden');
-    document.getElementsByClassName('character')[0].classList.remove('hidden');
+    localStorage.setItem('characterURL', characterImgURL);
 }
 
 // helper func

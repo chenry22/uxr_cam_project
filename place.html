@@ -7,11 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/addons/p5.sound.min.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Untitled CAM Project</title>
 </head>
 
 <body>
-    
+    <div id="place">
+        <div id="place-canvas"></div>
+        <div id="place-nav">
+            <div id="place-thumbnails"></div>
+            <div onclick="console.log('place!')">Place Character</div>
+        </div>
+    </div>
+    <script src="place.js"></script>
 </body>
 </html>

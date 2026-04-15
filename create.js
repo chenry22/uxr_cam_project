@@ -2,6 +2,9 @@ const bgColor = '#f2fffe';
 var floorOne, floorTwo, characterImg;
 
 const selectionPadding = 15;
+const selectionWidth = 2.5;
+const selectionBorderOpacity = 90; // out of 255
+
 const imageOutlineWidth = 1;
 const scaleRate = 1.5, rotateRate = 30;
 const minSize = 30, maxSize = 400;
@@ -19,25 +22,29 @@ var visPoint = [0, 0];
 function star(x, y, num_points, inner_radius, outer_radius) {
     const angle = 2 * Math.PI / num_points; // angle between two points
     const halfAngle = angle / 2.0; // angle between point and valley
-    
+    var vertices = [];
+
     beginShape();
     for (let a = 0; a < Math.PI * 2; a += angle) {
         let sx = x + Math.cos(a) * outer_radius;
         let sy = y + Math.sin(a) * outer_radius;
         vertex(sx, sy); // vertex at point of star
+        vertices.push([sx, sy]);
 
         sx = x + Math.cos(a + halfAngle) * inner_radius;
         sy = y + Math.sin(a + halfAngle) * inner_radius;
         vertex(sx, sy); // vertex at valley
+        vertices.push([sx, sy]);
     }
     endShape(CLOSE);
+    return vertices;
 }
 
 function pointInEllipse(x, y, pX, pY, w, h) {
     let theta = Math.atan2(h * (pY - y), w * (pX - x));
     let distance = (Math.pow((pX - x) * Math.cos(theta) + (pY - y) * Math.sin(theta), 2) / Math.pow(w, 2)) + 
                    (Math.pow((pX - x) * Math.sin(theta) - (pY - y) * Math.cos(theta), 2) / Math.pow(h, 2));
-    return distance <= 1;
+    return distance < 1;
 }
 
 // helper func from p5.js sketch: https://editor.p5js.org/tinywitchdraws/sketches/XExU8uTPN
@@ -56,6 +63,31 @@ function pointInTriangle(p, t0, t1, t2) {
     return s >= 0 && t >= 0 && s + t <= D;
 }
 
+// taken from p5.js example: https://editor.p5js.org/FChopin1/sketches/xHo_VY8Jr
+function pointInStar(vs) {
+    let total = 0;
+    let edges = []
+    for (let i = 0; i < vs.length; i++) {
+      const edge = [vs[i][0], vs[i][1], vs[(i + 1) % vs.length][0], vs[(i + 1) % vs.length][1]]
+      edges.push(edge);
+    }
+
+    let x = mouseX, y = mouseY;
+    for (let edge of edges) {
+        const edge_dx = edge[2] - edge[0]; 
+        const edge_dy = edge[3] - edge[1];
+        const det = -x * edge_dy + y * edge_dx;
+      
+        const t = (-edge[0] * edge_dy + edge[1] * edge_dx) / det;
+        const u = (x * edge[1] - y * edge[0]) / det;
+      
+        if (u > 0 && u < 1 && t > 0 && t < 1) {
+            total += 1
+        }
+    }
+    return total % 2 == 1;
+}
+
 // helper func to get angle between AB and BC vectors
 function findAngle(A, B, C) {
     // Vectors BA and BC
@@ -65,6 +97,13 @@ function findAngle(A, B, C) {
     const dot = v1.x * v2.x + v1.y * v2.y;
     const cross = v1.x * v2.y - v1.y * v2.x;
     return Math.atan2(cross, dot); // radians
+}
+
+function selectBorder() {
+    strokeWeight(selectionWidth);
+    drawingContext.setLineDash([5, 5]);
+    stroke(20, 60, 200, selectionBorderOpacity);
+    fill(255, 0);
 }
 
 
@@ -77,7 +116,7 @@ function drawable(x, y, type, color, data) {
         mouseOffsetX: 0, mouseOffsetY: 0,
         type: type, 
         color: color, texture: '',
-        data: data, 
+        data: data,
         moving: false,
         selected: false,
         draw: function() {
@@ -97,10 +136,8 @@ function drawable(x, y, type, color, data) {
 
                     if (this.selected) {
                         push();
-                        drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 200);
-                        fill(255, 0);
-                        ellipse(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
+                        selectBorder();
+                        rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
                         pop();
                     }
                     break;
@@ -114,32 +151,26 @@ function drawable(x, y, type, color, data) {
                     pop();
 
                     if (this.selected) {
-                        drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 200);
-                        fill(255, 0);
+                        push();
+                        selectBorder();
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
-                        fill(255);
-                        stroke(0);
-                        drawingContext.setLineDash([]);
+                        pop();
                     }
                     break;
                 case 'star':
                     push()
                     fill(color);
-                    star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2);
+                    this.data.vertices = star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2);
                     addTexture(textures[this.texture], 
                         () => star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2), 
                         this.x, this.y, this.data.r2 * 2, this.data.r2 * 2);
                     pop();
 
                     if (this.selected) {
-                        drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 200);
-                        fill(255, 0);
+                        push();
+                        selectBorder();
                         rect(this.x, this.y, this.data.r2 * 2 + selectionPadding * 2, this.data.r2 * 2 + selectionPadding * 2);
-                        fill(255);
-                        stroke(0);
-                        drawingContext.setLineDash([]);
+                        pop();
                     }
                     break;
                 case 'triangle':
@@ -158,13 +189,10 @@ function drawable(x, y, type, color, data) {
                     pop();
 
                     if (this.selected) {
-                        drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 200);
-                        fill(255, 0);
+                        push();
+                        selectBorder();
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
-                        fill(255);
-                        stroke(0);
-                        drawingContext.setLineDash([]);
+                        pop();
                     }
                     break;
                 case 'image':
@@ -176,13 +204,10 @@ function drawable(x, y, type, color, data) {
                     noTint();
 
                     if (this.selected) {
-                        drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 200);
-                        fill(255, 0);
+                        push();
+                        selectBorder();
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
-                        fill(255);
-                        stroke(0);
-                        drawingContext.setLineDash([]);
+                        pop();
                     }
                     break;
                 default:
@@ -244,16 +269,14 @@ function touchStarted() {
         let d = drawables[drawables.length - i - 1];
 
         // offset point to MINUS rotation to check if within bounds still...
-        console.log(mouseX, mouseY);
         let dx = mouseX - d.x, dy = mouseY - d.y;
         let cos = Math.cos(-d.rotation * (Math.PI / 180)), sin = Math.sin(-d.rotation * (Math.PI / 180));
         let x = d.x + dx * cos - dy * sin, y = d.y + dx * sin + dy * cos
-        console.log(x, y);
         visPoint = [x, y];
 
         let circleInteract = d.type === 'ellipse' && pointInEllipse(d.x, d.y, x, y, d.data.w / 2, d.data.h / 2);
         let rectInteract = d.type === 'rect' && x > d.x - d.data.w / 2 && x < d.x + d.data.w / 2 && y > d.y - d.data.h / 2 && y < d.y + d.data.h / 2;
-        let starInteract = d.type === 'star' && dist(d.x, d.y, x, y) < d.data.r2;
+        let starInteract = d.type === 'star' && pointInStar(d.data.vertices);
         let triInteract = d.type === 'triangle' && pointInTriangle([x, y], [-d.data.w / 2 + d.x, d.data.h / 2 + d.y], [d.x, -d.data.h / 2 + d.y], [d.data.w / 2 + d.x, d.data.h / 2 + d.y]);
         let imgInteract = d.type === 'image' && x > d.x - d.data.w / 2 && x < d.x + d.data.w / 2 && y > d.y - d.data.h / 2 && y < d.y + d.data.h / 2;
 
@@ -313,10 +336,10 @@ function touchMoved(e) {
                 scaleAmount *= scaleDir * scaleRate;
 
                 if (d.type === 'star') {
-                    let aspectRatio = d.data.r2 / d.data.r1;
-                    d.data.r1 += scaleAmount;
-                    d.data.r1 = Math.min(maxSize, Math.max(minSize, d.data.r1));
-                    d.data.r2 = d.data.r1 * aspectRatio;
+                    let aspectRatio = d.data.r1 / d.data.r2;
+                    d.data.r2 += scaleAmount;
+                    d.data.r2 = Math.min(maxSize, Math.max(minSize, d.data.r2));
+                    d.data.r1 = d.data.r2 * aspectRatio;
                 } else {
                     let aspectRatio = d.data.h / d.data.w;
                     d.data.w += scaleAmount;

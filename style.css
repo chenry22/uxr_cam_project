@@ -501,3 +501,36 @@ canvas {
   height: 28dvh;
   object-fit: contain;
 }
+
+#place {
+  display: flex;
+  flex-direction: column;
+}
+#place-nav {
+  position: relative;
+  margin: 0 8%;
+  flex-basis: 10%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  gap: 24px;
+}
+#place-thumbnails {
+  max-width: 100%;
+  overflow: auto hidden;
+  align-items: center;
+  max-height: 100%;
+  display: flex;
+  gap: 10px;
+}
+#place-thumbnails div {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 100px;
+  max-height: 120px;
+}
+#place-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
