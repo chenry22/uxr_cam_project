@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +30,11 @@
                     <div class="icon">⟳</div>
                     <div class="desc">Rotate</div>
                 </div>
+
+                <div id="delete" onpointerdown="deleteShape()">
+                    <div class="icon">🗑</div>
+                    <div class="desc">Delete</div>
+                </div>
             </div>
         </div>
 
@@ -40,13 +44,23 @@
                 <div>✐</div>
             </div>
 
-            <div id="color-swatches"></div>
-            <!-- <div id="shape-inventory">
-                <div class="circle" onclick="shapeResponse('circle')"><div></div></div>
-                <div class="triangle" onclick="shapeResponse('triangle')"><div></div></div>
-                <div class="rect" onclick="shapeResponse('rect')"><div></div></div>
-                <div class="oval" onclick="shapeResponse('oval')"><div></div></div>
-            </div> -->
+            <div class="creation-container-scroll">
+                <div id="color-swatches"></div>
+                <div id="texture-swatches">
+                    <div onclick="setTexture('')"></div>
+                    <div onclick="setTexture('paper-texture')"><img src="assets/paper-texture.png"/></div>
+                    <div onclick="setTexture('dot-texture')"><img src="assets/dot-texture.png"/></div>
+                    <div onclick="setTexture('marble-texture')"><img src="assets/marble-texture.png"/></div>
+                </div>
+
+                <div id="shape-inventory">
+                    <p id="shape-count">5/5 shapes available</p>
+                    <div class="shape circle" onclick="addShape('circle')"><div></div></div>
+                    <div class="shape inv-triangle" onclick="addShape('triangle')"><div></div></div>
+                    <div class="shape rect" onclick="addShape('rect')"><div></div></div>
+                    <div class="shape oval" onclick="addShape('oval')"><div></div></div>
+                </div>
+            </div>
         </div>
 
         <div id="question-container">

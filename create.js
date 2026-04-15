@@ -5,6 +5,8 @@ const selectionPadding = 15;
 const imageOutlineWidth = 1;
 const scaleRate = 1.5, rotateRate = 30;
 const minSize = 30, maxSize = 400;
+var textures = {};
+
 var mouseStart = [0, 0];
 var lastMouse = [0, 0];
 var editingEnabled = true;
@@ -74,7 +76,7 @@ function drawable(x, y, type, color, data) {
         x: x, y: y, rotation: 0,
         mouseOffsetX: 0, mouseOffsetY: 0,
         type: type, 
-        color: color,
+        color: color, texture: '',
         data: data, 
         moving: false,
         selected: false,
@@ -85,24 +87,35 @@ function drawable(x, y, type, color, data) {
 
             switch (type) {
                 case 'ellipse':
+                    push();
                     fill(color);
                     ellipse(this.x, this.y, this.data.w, this.data.h);
+                    addTexture(textures[this.texture], 
+                        () => ellipse(this.x, this.y, this.data.w, this.data.h), 
+                        this.x, this.y, this.data.w, this.data.h);
+                    pop();
+
                     if (this.selected) {
+                        push();
                         drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 100);
+                        stroke(20, 60, 200, 200);
                         fill(255, 0);
-                        rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
-                        fill(255);
-                        stroke(0);
-                        drawingContext.setLineDash([]);
+                        ellipse(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
+                        pop();
                     }
                     break;
                 case 'rect':
+                    push();
                     fill(color);
                     rect(this.x, this.y, this.data.w, this.data.h);
+                    addTexture(textures[this.texture], 
+                        () => rect(this.x, this.y, this.data.w, this.data.h), 
+                        this.x, this.y, this.data.w, this.data.h);
+                    pop();
+
                     if (this.selected) {
                         drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 100);
+                        stroke(20, 60, 200, 200);
                         fill(255, 0);
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
                         fill(255);
@@ -111,11 +124,17 @@ function drawable(x, y, type, color, data) {
                     }
                     break;
                 case 'star':
+                    push()
                     fill(color);
-                    star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2)
+                    star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2);
+                    addTexture(textures[this.texture], 
+                        () => star(this.x, this.y, this.data.pts, this.data.r1, this.data.r2), 
+                        this.x, this.y, this.data.r2 * 2, this.data.r2 * 2);
+                    pop();
+
                     if (this.selected) {
                         drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 100);
+                        stroke(20, 60, 200, 200);
                         fill(255, 0);
                         rect(this.x, this.y, this.data.r2 * 2 + selectionPadding * 2, this.data.r2 * 2 + selectionPadding * 2);
                         fill(255);
@@ -124,15 +143,23 @@ function drawable(x, y, type, color, data) {
                     }
                     break;
                 case 'triangle':
+                    push();
                     fill(color);
                     triangle(
                         -this.data.w / 2 + this.x, this.data.h / 2 + this.y, 
                         this.x, -this.data.h / 2 + this.y, 
                         this.data.w / 2 + this.x, this.data.h / 2 + this.y
                     );
+                    addTexture(textures[this.texture], () => triangle(
+                                -this.data.w / 2 + this.x, this.data.h / 2 + this.y, 
+                                this.x, -this.data.h / 2 + this.y, 
+                                this.data.w / 2 + this.x, this.data.h / 2 + this.y
+                            ), this.x, this.y, this.data.w, this.data.h);
+                    pop();
+
                     if (this.selected) {
                         drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 100);
+                        stroke(20, 60, 200, 200);
                         fill(255, 0);
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
                         fill(255);
@@ -150,7 +177,7 @@ function drawable(x, y, type, color, data) {
 
                     if (this.selected) {
                         drawingContext.setLineDash([5, 5]);
-                        stroke(20, 60, 200, 100);
+                        stroke(20, 60, 200, 200);
                         fill(255, 0);
                         rect(this.x, this.y, this.data.w + selectionPadding * 2, this.data.h + selectionPadding * 2);
                         fill(255);
@@ -171,16 +198,28 @@ function drawable(x, y, type, color, data) {
         },
     })
 }
+function addTexture(t, callback, x, y, w, h) {
+    if (t) {
+        clip(callback);
+        image(t, x, y, w, h);
+    }
+}
 
 var drawables = [];
+
+function preload() {
+    textures['paper-texture'] = loadImage('assets/paper-texture.png');
+    textures['dot-texture'] = loadImage('assets/dot-texture.png');
+    textures['marble-texture'] = loadImage('assets/marble-texture.png');
+}
 
 function setup() {
     let canvas = createCanvas(windowWidth * 0.5, windowHeight);
     canvas.parent('character-canvas');
-    pixelDensity(1);
+    pixelDensity(2);
     angleMode(DEGREES);
     imageMode(CENTER);
-    rectMode(CENTER) 
+    rectMode(CENTER);
     strokeWeight(0.5);
 }
 
@@ -193,11 +232,9 @@ function draw() {
     for (i in drawables) {
         drawables[i].draw();
     }
-
-    // circle(visPoint[0], visPoint[1], 10);
 }
 
-function touchStarted(e) {
+function touchStarted() {
     if (!editingEnabled) { return; }
 
     // if interacting with canvas element, get that canvas element
@@ -308,14 +345,27 @@ function touchMoved(e) {
     }
 }
 
+
+
+// edit mode interactions
 function setColor(color) {
     for (i in drawables) {
         let d = drawables[i];
         if (d.selected) {
             drawables[i] = drawable(d.x, d.y, d.type, color, d.data);
             drawables[i].rotation = d.rotation;
+            drawables[i].texture = d.texture;
             drawables[i].selected = true;
-            console.log(drawables);
+            return;
+        }
+    }
+}
+
+function setTexture(texture) {
+    for (i in drawables) {
+        let d = drawables[i];
+        if (d.selected) {
+            drawables[i].texture = texture;
             return;
         }
     }
@@ -328,5 +378,19 @@ function changeMode(mode) {
         document.getElementById('rotate-mode').classList.remove('active-mode');
         document.getElementById(mode).classList.add('active-mode');
         this.mode = mode;
+    }
+}
+
+function deleteShape() {
+    for (i in drawables) {
+        let d = drawables[i];
+        if (d.selected) {
+            if (d.data.deletable) {
+                drawables.splice(i, 1);
+                shapesRemaining++;
+                setShapeCountLabel();
+            }
+            return;
+        }
     }
 }

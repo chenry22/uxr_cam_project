@@ -1,6 +1,6 @@
 const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
 
-let questions = [
+const questions = [
     "What color do you feel like at the moment?",
     "Please choose a shape you most identify with right now.",
     "Share some reflections from your museum visit today:",
@@ -12,7 +12,10 @@ let questions = [
     "Leave a comment for other visitors! (optional)"
 ];
 
-let defaultColors = ['#ffffff', '#D42C41', '#3AC242', '#4A6EE0', '#FFF07A', '#FAA441', '#8F3287'];
+const defaultColors = ['#000000', "#ffffff", "#E6E6E6", '#FF2B01', '#00aeef'];
+
+const maxShapesAddable = 5;
+var shapesRemaining;
 
 var question = 0;
 var personalColor = '';
@@ -25,6 +28,8 @@ var previousVisits = -1;
 var characterImgURL;
 
 window.addEventListener('load', () => {
+    shapesRemaining = maxShapesAddable
+    setShapeCountLabel();
     loadStateOptions();
     loadQuestion(question);
     loadColors();
@@ -107,12 +112,8 @@ function submitResponse() {
             personalColor = document.getElementById('color-pick').value;
             document.documentElement.style.setProperty("--main-color", personalColor);
             
-            // add to swatches list
-            let c = document.createElement('div');
-            c.classList.add('color');
-            c.style.setProperty('background-color', personalColor);
-            c.setAttribute('onclick', "setColor('" + personalColor + "')");
-            document.getElementById('color-swatches').append(c);
+            // generate 5 variants of color and add these to swatch container
+            addPersonalColors();
             break;
         case 1: // shape
             if (personalShape === '') { return; }
@@ -141,9 +142,9 @@ function submitResponse() {
             // basically longer reflection means shape with more sides
             reflection = document.getElementById('reflection').getElementsByTagName('textarea')[0].value;
             if (reflection.length >= 120) {
-                drawables.push(drawable(200, 200, 'hexagon', personalColor, { w: 150, h: 150 }));
+                // drawables.push(drawable(200, 200, 'hexagon', personalColor, { w: 150, h: 150 }));
             } else if (reflection.length >= 90) {
-                drawables.push(drawable(200, 200, 'pentagon', personalColor, { w: 150, h: 150 }));
+                // drawables.push(drawable(200, 200, 'pentagon', personalColor, { w: 150, h: 150 }));
             } else if (reflection.length >= 60) {
                 drawables.push(drawable(200, 200, 'rect', personalColor, { w: 150, h: 150 }));
             } else if (reflection.length >= 30) {
@@ -306,6 +307,28 @@ function hexToRgb(hex) {
 
 
 // CREATION MODE
+function setShapeCountLabel() {
+    document.getElementById('shape-count').innerText = shapesRemaining + '/' + maxShapesAddable + '  shapes available';
+}
+
+function addShape(type) {
+    if (shapesRemaining <= 0) { return; }
+    if (type === 'circle') {
+        drawables.push(drawable(200, 200, 'ellipse', personalColor, { w: 150, h: 150, deletable: true }));
+        shapesRemaining--;
+    } else if (type === 'triangle') {
+        drawables.push(drawable(200, 200, 'triangle', personalColor, { w: 120, h: 120, deletable: true }));
+        shapesRemaining--;
+    } else if (type === 'rect') {
+        drawables.push(drawable(200, 200, 'rect', personalColor, { w: 200, h: 100, deletable: true }));
+        shapesRemaining--;
+    } else if (type === 'oval') {
+        drawables.push(drawable(200, 200, 'ellipse', personalColor, { w: 200, h: 100, deletable: true }));
+        shapesRemaining--;
+    }
+    setShapeCountLabel();
+}
+
 function loadColors() {
     let colors = document.getElementById('color-swatches');
     for (var color of defaultColors) {
@@ -315,4 +338,46 @@ function loadColors() {
         c.setAttribute('onclick', "setColor('" + color + "')");
         colors.append(c);
     }
+}
+
+function addPersonalColors() {
+    var amt = -30;
+    var shift = 15
+    for (let i = 0; i < 5; i++) {
+        let color = shadeColor(personalColor, amt);
+        let c = document.createElement('div');
+        c.classList.add('color');
+        c.style.setProperty('background-color', color);
+        c.setAttribute('onclick', "setColor('" + color + "')");
+        document.getElementById('color-swatches').append(c);
+        amt += shift;
+    }
+}
+
+// Source - https://stackoverflow.com/a/13532993
+// Posted by Pablo, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-14, License - CC BY-SA 4.0
+// for getting darker + lighter versions of the main color selected
+function shadeColor(color, percent) {
+    var R = parseInt(color.substring(1,3),16);
+    var G = parseInt(color.substring(3,5),16);
+    var B = parseInt(color.substring(5,7),16);
+
+    R = parseInt(R * (100 + percent) / 100);
+    G = parseInt(G * (100 + percent) / 100);
+    B = parseInt(B * (100 + percent) / 100);
+
+    R = (R<255)?R:255;  
+    G = (G<255)?G:255;  
+    B = (B<255)?B:255;  
+
+    R = Math.round(R)
+    G = Math.round(G)
+    B = Math.round(B)
+
+    var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+    var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+    var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
 }
