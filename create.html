@@ -17,6 +17,8 @@
 <body>
     <div id="main">
         <div id="character-canvas">
+            <div id="canvas-feedback">Select a shape to change its color</div>
+            
             <div id="actions">
                 <div id="move-mode" class="active-mode" onclick="changeMode('move-mode')">
                     <div class="icon">↔</div>
@@ -30,11 +32,10 @@
                     <div class="icon">⟳</div>
                     <div class="desc">Rotate</div>
                 </div>
+            </div>
 
-                <div id="delete" onpointerdown="deleteShape()">
-                    <div class="icon">🗑</div>
-                    <div class="desc">Delete</div>
-                </div>
+            <div id="delete" onpointerup="deleteShape()" onpointerenter="triggerDelete()" onpointerleave="leaveDelete()">
+                <div class="icon">🗑</div>
             </div>
         </div>
 
@@ -129,8 +130,8 @@
 
                 <!-- completion confirmation -->
                 <div id="complete-confirm" class="hidden">
-                    <div class="completion-button" onclick="submitCharacter()">Yes!</div>
                     <div class="completion-button" onclick="backToEditing()">No, take me back</div>
+                    <div class="completion-button yes-complete" onclick="submitCharacter()">Yes!</div>
                 </div>
 
                 <!-- comment -->

@@ -3,7 +3,7 @@ const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado',
 const questions = [
     "What color do you feel like at the moment?",
     "Please choose a shape you most identify with right now.",
-    "Share some reflections from your museum visit today (these will not be shared with other visitors):",
+    "Share some reflections from your museum visit today:",
     "What state are you from?",
     "Choose an object you're drawn to:",
     "How many times have you visited CAM before?",
@@ -171,7 +171,7 @@ function submitResponse() {
                 w = h * aspectRatio;
             }
             
-            state.resize(w * 2, h * 2);
+            state.resize(w * 1.5, h * 1.5);
             state.filter(THRESHOLD); // basically turns it white
             drawables.push(drawable(150, 150, 'image', personalColor, { img: state, w: w, h: h }));
             break;
@@ -293,6 +293,7 @@ function submitCharacter() {
     const character = document.getElementById("character-canvas").getElementsByTagName('canvas')[0];
     characterImgURL = character.toDataURL(); // convert to PNG?
     localStorage.setItem('characterURL', characterImgURL);
+    window.location.href = 'place.html';
 }
 
 // helper func
@@ -335,6 +336,7 @@ function loadColors() {
     for (var color of defaultColors) {
         let c = document.createElement('div');
         c.classList.add('color');
+        c.setAttribute('color', color);
         c.style.setProperty('background-color', color);
         c.setAttribute('onclick', "setColor('" + color + "')");
         colors.append(c);
@@ -348,11 +350,20 @@ function addPersonalColors() {
         let color = shadeColor(personalColor, amt);
         let c = document.createElement('div');
         c.classList.add('color');
+        c.setAttribute('color', color);
         c.style.setProperty('background-color', color);
         c.setAttribute('onclick', "setColor('" + color + "')");
         document.getElementById('color-swatches').append(c);
         amt += shift;
     }
+}
+
+// just give display feedback
+function triggerDelete() {
+    document.getElementById('delete').classList.add('delete-active');
+}
+function leaveDelete() {
+    document.getElementById('delete').classList.remove('delete-active');
 }
 
 // Source - https://stackoverflow.com/a/13532993

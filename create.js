@@ -241,7 +241,7 @@ function preload() {
 function setup() {
     let canvas = createCanvas(windowWidth * 0.5, windowHeight);
     canvas.parent('character-canvas');
-    pixelDensity(2);
+    pixelDensity(1.5);
     angleMode(DEGREES);
     imageMode(CENTER);
     rectMode(CENTER);
@@ -280,13 +280,20 @@ function touchStarted() {
         let triInteract = d.type === 'triangle' && pointInTriangle([x, y], [-d.data.w / 2 + d.x, d.data.h / 2 + d.y], [d.x, -d.data.h / 2 + d.y], [d.data.w / 2 + d.x, d.data.h / 2 + d.y]);
         let imgInteract = d.type === 'image' && x > d.x - d.data.w / 2 && x < d.x + d.data.w / 2 && y > d.y - d.data.h / 2 && y < d.y + d.data.h / 2;
 
-        if (!d.moving && (circleInteract || rectInteract || starInteract || triInteract || imgInteract)) {
+        let w = d.data.w ? d.data.w : d.data.r2 * 2;
+        let h = d.data.h ? d.data.h : d.data.r2 * 2;
+        let selectInteract = d.selected && x > d.x - w / 2 - selectionPadding && x < d.x + w / 2 + selectionPadding && y > d.y - h / 2 - selectionPadding && y < d.y + h / 2 + selectionPadding;
+
+        if (!d.moving && (selectInteract || (circleInteract || rectInteract || starInteract || triInteract || imgInteract))) {
             drawables = drawables.filter(item => {
                 return item !== d;
             });
             d.moving = true;
             d.mouseOffsetX = d.x - mouseX;
             d.mouseOffsetY = d.y - mouseY;
+            for (let j = 0; j < i; j++) {
+                drawables[j].selected = drawables[j].selected && drawables[j] === d;
+            }
             drawables.push(d);
             return; // early terminate, only one thing can be moved
         }
@@ -310,7 +317,7 @@ function touchEnded() {
         }
         drawables[i].moving = false;
     }
-    if (!newSelect) {
+    if (!newSelect && dist(mouseStart[0], mouseStart[1], mouseX, mouseY) < 0.5) {
         for (i in drawables) {
             drawables[i].selected = false;
         }
@@ -371,6 +378,14 @@ function touchMoved(e) {
 
 
 // edit mode interactions
+function showFeedback(txt) {
+    let feedback = document.getElementById('canvas-feedback');
+    feedback.innerText = txt;
+    feedback.classList.remove('fade-out-animation');
+    void feedback.offsetWidth;
+    feedback.classList.add('fade-out-animation');
+}
+
 function setColor(color) {
     for (i in drawables) {
         let d = drawables[i];
@@ -382,6 +397,9 @@ function setColor(color) {
             return;
         }
     }
+
+    // if no shape selected, give feedback
+    showFeedback("Select a shape to change its color");
 }
 
 function setTexture(texture) {
@@ -392,6 +410,9 @@ function setTexture(texture) {
             return;
         }
     }
+
+    // if no shape, give feedback
+    showFeedback("Select a shape to change its texture");
 }
 
 function changeMode(mode) {
@@ -405,6 +426,7 @@ function changeMode(mode) {
 }
 
 function deleteShape() {
+    document.getElementById('delete').classList.remove('delete-active');
     for (i in drawables) {
         let d = drawables[i];
         if (d.selected) {
@@ -412,6 +434,23 @@ function deleteShape() {
                 drawables.splice(i, 1);
                 shapesRemaining++;
                 setShapeCountLabel();
+            } else {
+                showFeedback("This shape cannot be deleted");
+            }
+            return;
+        }
+    }
+
+    // if nothing selected, assume element was dragged to space...
+    for (i in drawables) {
+        let d = drawables[i];
+        if (d.moving) {
+            if (d.data.deletable) {
+                drawables.splice(i, 1);
+                shapesRemaining++;
+                setShapeCountLabel();
+            } else {
+                showFeedback("This shape cannot be deleted");
             }
             return;
         }
