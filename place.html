@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,10 +15,24 @@
 
 <body>
     <div id="place">
-        <div id="place-canvas"></div>
-        <div id="place-nav">
+        <div id="place-canvas">
+            <div class="project-label"><b>CAM</b><br>Collage Club</div>
+            <div id="enter-cam" onclick="enterBuilding()">ENTER</div>
+        </div>
+
+
+        <div id="intro-instruct">Explore the museum, see past visitors, and find a place for your avatar to hang out!</div>
+        <div id="place-nav" class="hidden">
             <div id="place-thumbnails"></div>
-            <div onclick="console.log('place!')">Place Character</div>
+            <div id="place-button" onclick="placeCharacter()">Place Character</div>
+        </div>
+
+        <div id="add-comment" class="hidden">
+            <div id="comment-input">
+                <input type="text"/>
+            </div>
+            <div id="comment-back" onclick="backToPlace()"><- Back</div>
+            <div id="comment-instruct">Leave a comment for other visitors!</div>
         </div>
     </div>
     <script src="place.js"></script>
