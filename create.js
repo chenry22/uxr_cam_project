@@ -241,7 +241,7 @@ function preload() {
 function setup() {
     let canvas = createCanvas(windowWidth * 0.5, windowHeight);
     canvas.parent('character-canvas');
-    pixelDensity(1.5);
+    pixelDensity(1.2);
     angleMode(DEGREES);
     imageMode(CENTER);
     rectMode(CENTER);

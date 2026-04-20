@@ -3,6 +3,7 @@ var roomImgs = {};
 
 var activeRoom = '';
 var backgroundImg;
+var prevAvatars = [];
 const backgroundImageHeightPct = 0.78;
 
 let x = 300, y = 0, w = 0, h = 0, mouseOffsetX = 0, mouseOffsetY = 0;
@@ -17,6 +18,11 @@ function preload() {
         roomImgs[room].resize(windowWidth, windowHeight);
     }
     activeRoom = 'cam';
+
+    let url = localStorage.getItem('characterURL');
+    if (url) {
+        character = loadImage(url);
+    }
 }
 
 function setup() {
@@ -24,13 +30,19 @@ function setup() {
     w = windowWidth / 5;
     h = windowWidth / 2.5;
 
-    let url = localStorage.getItem('characterURL');
-    if (url) {
-        character = loadImage(url);
+    let storageStr = localStorage.getItem('avatars') ?? '';
+    for (var entry of storageStr.split('||')) {
+        if (entry.trim() === '') { continue; }
+        var data = entry.split(';;');
+        let img = loadImage(data[0].trim());
+        prevAvatars.push({ img, x: parseFloat(data[1]), y: parseFloat(data[2]), comment: data[3], room: data[4], showComment: false })
     }
+
     let canvas = createCanvas(windowWidth, windowHeight * backgroundImageHeightPct);
     canvas.parent('place-canvas');
+    rectMode(CENTER);
     imageMode(CENTER);
+    textAlign(CENTER, CENTER);
 }
 
 function windowResized() {
@@ -41,6 +53,16 @@ function draw() {
     clear();
     image(roomImgs[activeRoom], windowWidth / 2, windowHeight * backgroundImageHeightPct / 2, 
         windowWidth, windowHeight, 0, 0, 0, 0, COVER);
+
+    for (var a of prevAvatars) {
+        if (a.room === activeRoom) {
+            image(a.img, a.x, a.y, w, h, 0, 0, 0, 0, CONTAIN);
+            if (a.showComment) {
+                rect(a.x + w/2, a.y - h/5, 100, 60);
+                text(a.comment, a.x + w/2, a.y - h/5, 100, 60);
+            }
+        }
+    }
 
     if (character) {
         image(character, x, y, w, h, 0, 0, 0, 0, CONTAIN);
@@ -67,6 +89,13 @@ function touchStarted() {
         helperText = false;
     } else {
         moving = false;
+
+        // check overlap with current avatars, show comment
+        for (var a of prevAvatars) {
+            if (a.room === activeRoom && mouseX > a.x - w/2 && mouseX < a.x + w/2 && mouseY > a.y - h/2 && mouseY < a.y + h/2){
+                a.showComment = !a.showComment;
+            }
+        }
     }
 }
 function touchMoved(e) {
@@ -112,13 +141,22 @@ function setActiveRoom(r) {
 function placeCharacter() {
     movementEnabled = false;
     moving = false;
+    helperText = false;
     document.getElementById('place-nav').classList.add('hidden');
     document.getElementById('add-comment').classList.remove('hidden');
-    document.getElementById('comment-input').style.top = x + 'px';
-    document.getElementById('comment-input').style.left = y + 'px';
+    document.getElementById('comment-input').style.left = x  + (w / 3) + 'px';
+    document.getElementById('comment-input').style.top = y - (h / 3) + 'px';
 }
 function backToPlace() {
     movementEnabled = true;
     document.getElementById('place-nav').classList.remove('hidden');
     document.getElementById('add-comment').classList.add('hidden');
+}
+
+function completeCreation() {
+    let storageStr = localStorage.getItem('avatars') ?? '';
+    let img = localStorage.getItem('characterURL') ?? '';
+    let comment = document.getElementById('comment-input').getElementsByTagName('input')[0].value;
+    storageStr += `||${img};;${x};;${y};;${comment};;${activeRoom}`
+    localStorage.setItem('avatars', storageStr);
 }
