@@ -58,17 +58,17 @@ canvas {
 #mode-switch {
   z-index: 1;
   position: absolute;
-  left: -62px;
+  left: -12dvh;
   top: 0;
   width: fit-content;
 }
-#mode-switch div {
-  width: 60px;
-  height: 50px;
+#mode-switch > div {
+  width: 12dvh;
+  height: 10dvh;
   text-align: center;
   padding-top: 10px;
   font-size: 2rem;
-  margin-top: 20px;
+  margin-top: 10px;
   border: 3px solid rgba(0, 0, 0, 0.03);
   border-right: none;
   background-color: var(--prompt-bg-color);
@@ -79,6 +79,11 @@ canvas {
 .inactive-mode:hover {
   cursor: pointer;
   background-color: rgb(249, 249, 233) !important;
+}
+
+.secondary-label {
+  color: black;
+  font-size: 0.8rem;
 }
 
 #character-canvas {
@@ -177,8 +182,8 @@ canvas {
   border-radius: 100%;
   border: 3px solid rgba(0, 0, 0, 0.05);
   flex-basis: 16%;
-  min-width: 48px;
-  max-width: 90px;
+  min-width: 40px;
+  max-width: 76px;
   aspect-ratio: 1;
 }
 .color:hover {
@@ -189,25 +194,25 @@ canvas {
 #texture-swatches {
   padding: 14px 20px;
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: space-evenly;
   gap: 10px;
   background-color: rgb(215, 207, 207);
   border: 3px solid rgba(0, 0, 0, 0.03);
 }
 #texture-swatches div {
   background-color: white;
-  border-radius: 100%;
   border: 3px solid rgba(0, 0, 0, 0.05);
-  flex-basis: 18%;
-  max-width: 100px;
+  flex-basis: 14%;
+  border-radius: 20%;
+  min-width: 50px;
+  max-width: 80px;
   aspect-ratio: 1;
 }
 #texture-swatches img {
   width: 100%;
   height: 100%;
+  border-radius: 20%;
   object-fit: cover;
-  border-radius: 100%;
 }
 #texture-swatches div:hover {
   cursor: pointer;
@@ -458,7 +463,7 @@ canvas {
 }
 
 #visits {
-  width: 80%;
+  width: 10dvw;
   border: none;
   border-bottom: 2px solid rgb(72, 72, 72);
   font-family: 'Space Grotesk';
@@ -469,6 +474,23 @@ canvas {
   margin-top: 10px;
   font-style: italic;
   color: rgb(86, 86, 86);
+}
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 10px rgb(255, 50, 102));
+  }
+  to {
+    filter: drop-shadow(0 0 30px rgb(102, 135, 255));
+  }
+}
+#visits-preview {
+  margin-top: 20px;
+  height: 30dvh;
+}
+#visits-preview img {
+  height: 30dvh;
+  object-fit: contain;
+  animation: glow 4s alternate infinite ease-in-out;
 }
 
 .completion-button {
@@ -498,7 +520,7 @@ canvas {
 
 @keyframes fade-out {
   0% { opacity: 1; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.75; }
   100% { opacity: 0;}
 }
 #canvas-feedback {
@@ -514,7 +536,32 @@ canvas {
   padding: 14px 20px;
 }
 .fade-out-animation {
-  animation: fade-out 2.4s ease-in-out;
+  animation: fade-out 4s ease-in-out;
+}
+
+
+#eyes-inventory, #mouth-inventory {
+  text-align: left;
+}
+.inv {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+}
+.inv > div {
+  flex-basis: 20%;
+  max-width: 60px;
+  height: 10dvh;
+}
+.inv > div:hover {
+  cursor: pointer;
+  background-color: white;
+}
+.inv img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 

@@ -196,12 +196,14 @@ function drawable(x, y, type, color, data) {
                     }
                     break;
                 case 'image':
+                    push()
                     tint('black')
                     image(this.data.img, this.x, this.y, 
                         this.data.w + imageOutlineWidth * 2, this.data.h + imageOutlineWidth * 2);
                     tint(this.color);
                     image(this.data.img, this.x, this.y, this.data.w, this.data.h);
                     noTint();
+                    pop();
 
                     if (this.selected) {
                         push();
@@ -241,7 +243,7 @@ function preload() {
 function setup() {
     let canvas = createCanvas(windowWidth * 0.5, windowHeight);
     canvas.parent('character-canvas');
-    pixelDensity(1.2);
+    pixelDensity(1.3);
     angleMode(DEGREES);
     imageMode(CENTER);
     rectMode(CENTER);
@@ -432,8 +434,14 @@ function deleteShape() {
         if (d.selected) {
             if (d.data.deletable) {
                 drawables.splice(i, 1);
-                shapesRemaining++;
-                setShapeCountLabel();
+                if (d.data.mouth) {
+                    mouth = null;
+                } else if (d.data.eyes) {
+                    eyes = null;
+                } else {
+                    shapesRemaining++;
+                    setShapeCountLabel();
+                }
             } else {
                 showFeedback("This shape cannot be deleted");
             }
@@ -447,8 +455,14 @@ function deleteShape() {
         if (d.moving) {
             if (d.data.deletable) {
                 drawables.splice(i, 1);
-                shapesRemaining++;
-                setShapeCountLabel();
+                if (d.data.mouth) {
+                    mouth = null;
+                } else if (d.data.eyes) {
+                    eyes = null;
+                } else {
+                    shapesRemaining++;
+                    setShapeCountLabel();
+                }
             } else {
                 showFeedback("This shape cannot be deleted");
             }

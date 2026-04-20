@@ -16,7 +16,7 @@ const defaultColors = ['#000000', "#ffffff", "#E6E6E6", '#FF2B01', '#00aeef'];
 const maxShapesAddable = 5;
 var shapesRemaining;
 
-var question = 0;
+var question = 5;
 var personalColor = '';
 var personalShape = '';
 var reflection = '';
@@ -24,6 +24,8 @@ var state = null;
 var object = null;
 var previousVisits = -1;
 
+var eyes = null;
+var mouth = null;
 var characterImgURL;
 
 window.addEventListener('load', () => {
@@ -112,6 +114,7 @@ function loadQuestion(i) {
 }
 
 function submitResponse() {
+    console.log('func')
     switch(question) {
         case 0: // color
             personalColor = document.getElementById('color-pick').value;
@@ -119,6 +122,7 @@ function submitResponse() {
             
             // generate 5 variants of color and add these to swatch container
             addPersonalColors();
+            showFeedback("New colors added in Design mode")
             break;
         case 1: // shape
             if (personalShape === '') { return; }
@@ -193,7 +197,54 @@ function submitResponse() {
             break;
         case 5: // prev visits
             if (previousVisits < 0) { return; }
+            console.log('ping', previousVisits)
             drawables.push(drawable(200, 200, 'star', personalColor, { pts: 4 + previousVisits, r1: 40, r2: 100 }));
+
+            if (previousVisits === 0) {
+                console.log('first bage')
+                let badge = loadImage('assets/badges/first.png', () => {
+                    var w, h, largerSide = 150;
+                    var aspectRatio = badge.width / badge.height;
+                    if (badge.width > badge.height) {
+                        w = largerSide;
+                        h = w / aspectRatio;
+                    } else {
+                        h = largerSide;
+                        w = h * aspectRatio;
+                    }
+                    badge.resize(w * 5, h * 5);
+                    drawables.push(drawable(150, 150, 'image', '', { img: badge, w: w, h: h, deletable: true }));
+                });
+            } else if (previousVisits === 4) {
+                let badge = loadImage('assets/badges/fifth.png', () => {
+                    var w, h, largerSide = 150;
+                    var aspectRatio = badge.width / badge.height;
+                    if (badge.width > badge.height) {
+                        w = largerSide;
+                        h = w / aspectRatio;
+                    } else {
+                        h = largerSide;
+                        w = h * aspectRatio;
+                    }
+                    badge.resize(w * 5, h * 5);
+                    drawables.push(drawable(150, 150, 'image', '', { img: badge, w: w, h: h, deletable: true }));
+                });
+            } else if (previousVisits === 9) {
+                let badge = loadImage('assets/badges/tenth.png', () => {
+                    var w, h, largerSide = 150;
+                    var aspectRatio = badge.width / badge.height;
+                    if (badge.width > badge.height) {
+                        w = largerSide;
+                        h = w / aspectRatio;
+                    } else {
+                        h = largerSide;
+                        w = h * aspectRatio;
+                    }
+                    badge.resize(w * 3, h * 3);
+                    drawables.push(drawable(150, 150, 'image', '', { img: badge, w: w, h: h, deletable: true }));
+                });
+            }
+            console.log('pong')
             break;
         case 6: // initial completion confirm
             editingEnabled = false;
@@ -281,6 +332,20 @@ function visitResponse() {
     } else {
         previousVisits = visits;
         document.getElementById('visits-error').classList.add('hidden');
+
+        var child = '';
+        document.getElementById('visits-preview').innerHTML = '';
+        if (visits === 0) {
+            child = document.createElement('img');
+            child.src = 'assets/badges/first.png';
+        } else if (visits === 4) {
+            child = document.createElement('img');
+            child.src = 'assets/badges/fifth.png';
+        } else if (visits === 9) {
+            child = document.createElement('img');
+            child.src = 'assets/badges/tenth.png';
+        }
+        document.getElementById('visits-preview').append(child);
     }
 }
 
@@ -296,21 +361,13 @@ function submitCharacter() {
     window.location.href = 'place.html';
 }
 
-// helper func
-function hexToRgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}
+
 
 
 
 // CREATION MODE
 function setShapeCountLabel() {
-    document.getElementById('shape-count').innerText = shapesRemaining + '/' + maxShapesAddable + '  shapes available';
+    document.getElementById('shape-count').innerText = shapesRemaining + '/' + maxShapesAddable + '  shapes available (click to add to canvas)';
 }
 
 function addShape(type) {
@@ -344,19 +401,75 @@ function loadColors() {
 }
 
 function addPersonalColors() {
-    var amt = -30;
-    var shift = 15
-    for (let i = 0; i < 5; i++) {
-        let color = shadeColor(personalColor, amt);
+    var rgb = hexToRgb(personalColor);
+    var hsv = rgb2hsv(rgb.r / 255, rgb.g / 255, rgb.b / 255);
+    var shift = 20; // rate of hue shift
+    var shiftAmt = 3; // how much to each end of spectrum should be shifted
+    var amt = hsv[0] - (shift * shiftAmt);
+    var upperLimit = hsv[0] + (shift * shiftAmt);
+
+    while (amt < 0) {
+        upperLimit += shift; // add offset
+        amt += shift;
+    }
+
+    for (amt; amt <= upperLimit; amt += shift) {
+        let tmpRgb = hsv2rgb(amt, hsv[1], hsv[2]);
+        let color = rgbToHex(Math.round(tmpRgb[0] * 255), Math.round(tmpRgb[1] * 255), Math.round(tmpRgb[2] * 255));
         let c = document.createElement('div');
         c.classList.add('color');
         c.setAttribute('color', color);
         c.style.setProperty('background-color', color);
         c.setAttribute('onclick', "setColor('" + color + "')");
         document.getElementById('color-swatches').append(c);
-        amt += shift;
     }
 }
+
+function addEye(num) {
+    if (eyes) { 
+        showFeedback("You can only have one pair of eyes")
+        return; 
+    }
+    document.getElementById('eyes-inventory').classList.add('inactive-inv');
+    eyes = loadImage('assets/faces/eyes-' + num + '.png', () => {
+        var w, h, largerSide = 60;
+        var aspectRatio = eyes.width / eyes.height;
+        if (eyes.width > eyes.height) {
+            w = largerSide;
+            h = w / aspectRatio;
+        } else {
+            h = largerSide;
+            w = h * aspectRatio;
+        }
+        eyes.resize(w * 12, h * 12);
+        eyes.filter(INVERT);
+        drawables.push(drawable(150, 150, 'image', '#000000', { img: eyes, w: w, h: h, deletable: true, eyes: true }));
+    });
+}
+function addMouth(num) {
+    if (mouth) { 
+        showFeedback("You can only have one mouth")
+        return; 
+    }
+    document.getElementById('mouth-inventory').classList.add('inactive-inv');
+    mouth = loadImage('assets/faces/mouth-' + num + '.png', () => {
+        var w, h, largerSide = 60;
+        var aspectRatio = mouth.width / mouth.height;
+        console.log(mouth.width, mouth.height, mouth);
+        if (mouth.width > mouth.height) {
+            w = largerSide;
+            h = w / aspectRatio;
+        } else {
+            h = largerSide;
+            w = h * aspectRatio;
+        }
+        mouth.resize(w * 12, h * 12);
+        mouth.filter(INVERT);
+        drawables.push(drawable(150, 150, 'image', '#000000', { img: mouth, w: w, h: h, deletable: true, mouth: true }));
+    });
+}
+
+
 
 // just give display feedback
 function triggerDelete() {
@@ -366,6 +479,45 @@ function leaveDelete() {
     document.getElementById('delete').classList.remove('delete-active');
 }
 
+
+
+
+
+// helper color funcs
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+// Source - https://stackoverflow.com/a/54070620
+// Posted by Kamil Kiełczewski, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-20, License - CC BY-SA 4.0
+
+// input: r,g,b in [0,1], out: h in [0,360) and s,v in [0,1]
+function rgb2hsv(r,g,b) {
+  let v=Math.max(r,g,b), c=v-Math.min(r,g,b);
+  let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+  return [60*(h<0?h+6:h), v&&c/v, v];
+}
+// Source - https://stackoverflow.com/a/54024653
+// Posted by Kamil Kiełczewski, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-20, License - CC BY-SA 4.0
+
+// input: h in [0,360] and s,v in [0,1] - output: r,g,b in [0,1]
+function hsv2rgb(h,s,v)  {                              
+  let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);     
+  return [f(5),f(3),f(1)];       
+}   
 // Source - https://stackoverflow.com/a/13532993
 // Posted by Pablo, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-04-14, License - CC BY-SA 4.0

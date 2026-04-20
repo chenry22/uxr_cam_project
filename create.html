@@ -41,8 +41,14 @@
 
         <div id="creation-container" class="hidden">
             <div id="mode-switch">
-                <div class="inactive-mode" onclick="questionMode()">?</div>
-                <div>✐</div>
+                <div class="inactive-mode" onclick="questionMode()">
+                    ?
+                    <div class="secondary-label">Respond</div>
+                </div>
+                <div>
+                    ✐
+                    <div class="secondary-label">Design</div>
+                </div>
             </div>
 
             <div class="creation-container-scroll">
@@ -55,19 +61,48 @@
                 </div>
 
                 <div id="shape-inventory">
-                    <p id="shape-count">5/5 shapes available</p>
+                    <p id="shape-count">5/5 shapes available (Click to add to canvas)</p>
                     <div class="shape circle" onclick="addShape('circle')"><div></div></div>
                     <div class="shape inv-triangle" onclick="addShape('triangle')"><div></div></div>
                     <div class="shape rect" onclick="addShape('rect')"><div></div></div>
                     <div class="shape oval" onclick="addShape('oval')"><div></div></div>
+                </div>
+
+                <div id="eyes-inventory">
+                    <p class="inv-label">Choose a pair of eyes, if you'd like to</p>
+                    <div class="inv">
+                        <div onclick="addEye('1')"><img src="assets/faces/eyes-1.png"/></div>
+                        <div onclick="addEye('2')"><img src="assets/faces/eyes-2.png"/></div>
+                        <div onclick="addEye('3')"><img src="assets/faces/eyes-3.png"/></div>
+                        <div onclick="addEye('4')"><img src="assets/faces/eyes-4.png"/></div>
+                        <div onclick="addEye('5')"><img src="assets/faces/eyes-5.png"/></div>
+                        <div onclick="addEye('6')"><img src="assets/faces/eyes-6.png"/></div>
+                    </div>
+                </div>
+                <div id="mouth-inventory">
+                    <p class="inv-label">Choose a mouth, if you want</p>
+                    <div class="inv">
+                        <div onclick="addMouth('1')"><img src="assets/faces/mouth-1.png"/></div>
+                        <div onclick="addMouth('2')"><img src="assets/faces/mouth-2.png"/></div>
+                        <div onclick="addMouth('3')"><img src="assets/faces/mouth-3.png"/></div>
+                        <div onclick="addMouth('4')"><img src="assets/faces/mouth-4.png"/></div>
+                        <div onclick="addMouth('5')"><img src="assets/faces/mouth-5.png"/></div>
+                        <div onclick="addMouth('6')"><img src="assets/faces/mouth-6.png"/></div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="question-container">
             <div id="mode-switch">
-                <div>?</div>
-                <div class="inactive-mode" onclick="creationMode()">✐</div>
+                <div>
+                    ?
+                    <div class="secondary-label">Respond</div>
+                </div>
+                <div class="inactive-mode" onclick="creationMode()">
+                    ✐
+                    <div class="secondary-label">Design</div>
+                </div>
             </div>
 
             <h2 id="prompt">This is a question.</h2>
@@ -120,9 +155,7 @@
                         onchange="visitResponse()" onkeyup="visitResponse()">
                     <div id="visits-error" class="hidden">Please input a valid number</div>
 
-                    <div id="visits-preview">
-                        <!-- TBD... -->
-                    </div>
+                    <div id="visits-preview"></div>
                 </div>
 
                 <!-- completion -->
