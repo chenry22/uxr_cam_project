@@ -16,7 +16,7 @@ const defaultColors = ['#000000', "#ffffff", "#E6E6E6", '#FF2B01', '#00aeef'];
 const maxShapesAddable = 5;
 var shapesRemaining;
 
-var question = 5;
+var question = 0;
 var personalColor = '';
 var personalShape = '';
 var reflection = '';
