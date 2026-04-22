@@ -154,9 +154,16 @@ function backToPlace() {
 }
 
 function completeCreation() {
+    // save image
     let storageStr = localStorage.getItem('avatars') ?? '';
     let img = localStorage.getItem('characterURL') ?? '';
     let comment = document.getElementById('comment-input').getElementsByTagName('input')[0].value;
     storageStr += `||${img};;${x};;${y};;${comment};;${activeRoom}`
     localStorage.setItem('avatars', storageStr);
+
+    document.getElementById('add-comment').classList.add('hidden');
+    document.getElementById('outro').classList.remove('hidden');
+}
+function backToMain() {
+    window.location.href = 'index.html';
 }

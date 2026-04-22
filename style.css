@@ -566,7 +566,7 @@ canvas {
 }
 .completion-button:hover {
   cursor: pointer;
-  background-color: rgba(246, 255, 255, 0.95);
+  background-color: rgba(20, 20, 20, 0.95);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -807,4 +807,13 @@ canvas {
 #comment-submit:hover {
   cursor: pointer;
   background-color: rgb(240, 240, 240);
+}
+
+#outro {
+  position: relative;
+}
+#outro-instruct {
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 24px 10%;
 }
