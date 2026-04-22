@@ -5,6 +5,8 @@ var activeRoom = '';
 var backgroundImg;
 var prevAvatars = [];
 const backgroundImageHeightPct = 0.78;
+const danceRate = 0.016;
+const danceAmt = 0.16;
 
 let x = 300, y = 0, w = 0, h = 0, mouseOffsetX = 0, mouseOffsetY = 0;
 var character = null;
@@ -35,13 +37,18 @@ function setup() {
         if (entry.trim() === '') { continue; }
         var data = entry.split(';;');
         let img = loadImage(data[0].trim());
-        prevAvatars.push({ img, x: parseFloat(data[1]), y: parseFloat(data[2]), comment: data[3], room: data[4], showComment: false })
+        prevAvatars.push({ img, 
+            x: parseFloat(data[1]), y: parseFloat(data[2]), 
+            comment: data[3], room: data[4], showComment: false,
+            rotation: 0, dancing: false, changeDir: false
+        })
     }
 
     let canvas = createCanvas(windowWidth, windowHeight * backgroundImageHeightPct);
     canvas.parent('place-canvas');
     rectMode(CENTER);
     imageMode(CENTER);
+    rotate
     textAlign(CENTER, CENTER);
 }
 
@@ -56,11 +63,31 @@ function draw() {
 
     for (var a of prevAvatars) {
         if (a.room === activeRoom) {
+            if (!a.dancing && Math.random() > 0.985) {
+                a.dancing = true;
+                a.rotation = Math.random() > 0.5 ? -0.02 : 0.02;
+            }
+            if (a.dancing) {
+                a.rotation += (a.rotation < 0 ? -danceRate : danceRate) * (a.changeDir ? -1 : 1);
+                if (Math.abs(a.rotation) > danceAmt && !a.changeDir) {
+                    a.changeDir = true;
+                } else if (Math.abs(a.rotation) < 0.01) {
+                    a.changeDir = false;
+                    a.dancing = false;
+                    a.rotation = 0;
+                }
+            }
+            push();
+            translate(a.x, a.y + h/6);
+            rotate(a.rotation);
+            translate(-a.x, -(a.y + h/6));
             image(a.img, a.x, a.y, w, h, 0, 0, 0, 0, CONTAIN);
+
             if (a.showComment) {
                 rect(a.x + w/2, a.y - h/5, 100, 60);
                 text(a.comment, a.x + w/2, a.y - h/5, 100, 60);
             }
+            pop();
         }
     }
 

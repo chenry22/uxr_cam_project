@@ -566,7 +566,7 @@ canvas {
 }
 .completion-button:hover {
   cursor: pointer;
-  background-color: rgba(20, 20, 20, 0.95);
+  background-color: rgba(244, 244, 244, 0.95);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -580,6 +580,9 @@ canvas {
 .yes-complete {
   background-color: black;
   color: white;
+}
+.yes-complete:hover {
+  background-color: rgb(52, 52, 52);
 }
 
 @keyframes fade-out {
